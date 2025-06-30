@@ -7,16 +7,19 @@ buildscript {
 plugins {
     id "java"
     id "application"
+    id "jvm-test-suite"
     id "eclipse"
 
+    id "checkstyle"
+    id "com.github.spotbugs" version "6.2.1"
     id "project-report"
     id "jacoco"
     id "pmd"
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion(11)
-    targetCompatibility = JavaVersion.toVersion(11)
+    sourceCompatibility = JavaVersion.toVersion(17)
+    targetCompatibility = JavaVersion.toVersion(17)
 }
 
 repositories {
@@ -49,52 +52,70 @@ run {
 }
 
 application {
-    mainClass = "polyhedra.CreatePolyhedra"
+    mainClass = "edu.odu.cs.cs330.Storage"
 }
 
-// Apply common settings for both test (unit test) and integration test tasks
-tasks.withType(Test) {
-    useJUnitPlatform()
+testing {
+    suites {
+        test {
+            useJUnitJupiter()
 
-    reports {
-        html.required = true
+        }
     }
+}
+
+test {
     ignoreFailures = true
 
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }
-}
 
-test {
-    // finalizedBy jacocoTestReport
+    finalizedBy jacocoTestReport
 }
 
 //------------------------------------------------------------------------------
 // Documentation Tool(s)
 //------------------------------------------------------------------------------
 javadoc {
-    failOnError false
+    failOnError = false
 }
 
 //------------------------------------------------------------------------------
 // Analysis Tool(s)
 //------------------------------------------------------------------------------
-
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.13"
 }
 
 jacocoTestReport {
     reports {
-        html.required = true
         xml.required = true
         csv.required = true
     }
 }
 
+// SpotBugs
+spotbugs {
+    toolVersion = "4.9.3"
+}
+
+spotbugsMain {
+    ignoreFailures = true
+    effort = com.github.spotbugs.snom.Effort.MAX
+    reportLevel = com.github.spotbugs.snom.Confidence.values()[1] // Medium
+    reports {
+       xml.required = false
+       html.required = true
+    }
+}
+
+spotbugsTest.enabled = false
+// End SpotBugs config
+
 pmd {
-    toolVersion = "6.21.0"
+    toolVersion = "7.0.0"
+
     ignoreFailures = true
     ruleSets = [
         "category/java/bestpractices.xml",
@@ -105,4 +126,18 @@ pmd {
     ]
 }
 
+// Check Style Config
+checkstyle {
+    toolVersion = "10.12.4"
+    ignoreFailures = true
+    showViolations = false
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        html.outputLocation = project.file("build/reports/checkstyle/main.html")
+    }
+}
+checkstyleTest.enabled = false
+// End Checkstyle config
 
