@@ -43,9 +43,11 @@ public class Consumable extends Item {
      */
     public Consumable()
     {
-        super("[Placeholder]");
+        super("");
 
         // Complete the remainder of this method
+        this.effect = "";
+        this.uses = 0;
     }
 
     /**
@@ -98,13 +100,15 @@ public class Consumable extends Item {
     public int requiredNumberOfValues()
     {
         // Replace this with the correct value
-        return -1;
+        return 3;
     }
 
     @Override
     public void fromTokens(String[] tokens)
     {
-
+    	this.setName(tokens[0]);
+    	this.setEffect(tokens[1]);
+    	this.setNumberOfUses(Integer.parseInt(tokens[2]));
     }
 
     /**
@@ -114,7 +118,12 @@ public class Consumable extends Item {
     public Item clone()
     {
         // Replace the next line
-        return null;
+        Consumable cpy = new Consumable();
+        cpy.setName(this.getName());
+        cpy.setEffect(this.getEffect());
+        cpy.setNumberOfUses(this.getNumberOfUses());
+        return cpy;
+        
     }
 
     /**
@@ -130,7 +139,10 @@ public class Consumable extends Item {
         }
 
         // Replace the "return false" with your logic
-        return false;
+        Consumable other = (Consumable) rhs;
+        
+        return this.getName().equals(other.getName())
+        		&& this.getEffect().equals(other.getEffect());
     }
 
     /**
@@ -142,7 +154,7 @@ public class Consumable extends Item {
     @Override
     public int hashCode()
     {
-        return -1;
+        return this.getName().hashCode() + this.getEffect().hashCode();
     }
 
     /**
@@ -151,6 +163,12 @@ public class Consumable extends Item {
     @Override
     public String toString()
     {
-        return "Make sure to check Armour.toString for hints.";
+        //return "Make sure to check Armour.toString for hints.";
+    	return String.format(
+    			FMT_STR, 
+    			this.getName(),
+    			this.getEffect(),
+    			this.getNumberOfUses()
+    			);
     }
 }
